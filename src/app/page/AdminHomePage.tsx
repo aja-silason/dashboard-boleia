@@ -5,6 +5,7 @@ import { useGetAllDrivers } from '../infra/hooks/driver/useGetAllDrivers';
 import { useGetAllTravel } from '../infra/hooks/travel/useGetAllTravel';
 import { RefreshButton } from '../component/button/Refreshutton';
 import { useNavigate } from 'react-router-dom';
+import { formatDate } from '../utils/fomateDate';
 
 export default function AdminHomePage() {
 
@@ -13,9 +14,15 @@ export default function AdminHomePage() {
 
   const navigate = useNavigate();
 
-  const approvedDrivers = data.filter(driver => driver?.status?.includes("APPROVED"));
-  const requestDrivers = data.filter(driver => driver?.status?.includes("PENDING"));
-  const approvedTravels = travel.filter(travel => travel?.status?.includes("COMPLETED"));
+  const approvedDrivers = data?.filter(driver => driver?.status?.includes("APPROVED"));
+  const requestDrivers = data?.filter(driver => driver?.status?.includes("PENDING"));
+  const approvedTravels = travel?.filter(travel => travel?.status?.includes("COMPLETED"));
+
+    const sortedDrivers = [...requestDrivers].sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    const drivers = sortedDrivers?.slice(0, 5);
 
   const splitInitial = (value: string): string => {
     const twoLetters = value.split(' ');
@@ -23,6 +30,18 @@ export default function AdminHomePage() {
     const second = twoLetters[1].split('')[0] == undefined ? '' : twoLetters[1].split('')[0];
     return first +""+ second;
   }
+
+  const totalValueOfTravels = approvedTravels.reduce((acc, current) => {
+    // Substitua 'amount' pelo nome real do campo no seu JSON (ex: price, cost, etc)
+    const value = +current.price * +current?.availablePassangers?.length || 0; 
+    return acc + value;
+  }, 0);
+
+  // Formatação para Kwanza (Moeda de Angola)
+  const formattedTotal = new Intl.NumberFormat('pt-AO', {
+    style: 'currency',
+    currency: 'AOA',
+  }).format(totalValueOfTravels);
 
   const fetch = () => {
     handleFetch();
@@ -67,7 +86,7 @@ export default function AdminHomePage() {
         />
         <StatCard 
           title="Receita Total" 
-          value="2.450.000 Kz" 
+          value={formattedTotal} 
           change="+5%" 
           isPositive={true} 
           icon={<CheckCircle2 className="text-indigo-600" />} 
@@ -81,7 +100,7 @@ export default function AdminHomePage() {
             <button onClick={() => navigate("/motoristas")} className="text-blue-600 text-sm font-semibold hover:underline">Ver todos</button>
           </div>
           <div className="divide-y divide-slate-50">
-            {requestDrivers?.slice(0, 5)?.map((item, index: number) => (
+            {drivers?.map((item, index: number) => (
               <div key={index} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">
@@ -89,7 +108,7 @@ export default function AdminHomePage() {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-700">{item?.user.firstName +' ' + item?.user.lastName}</p>
-                    <p className="text-xs text-slate-500">NIF: {item?.identificationNumber} • Cadastrado há 2h</p>
+                    <p className="text-xs text-slate-500">NIF: {item?.identificationNumber} • {formatDate(item?.createdAt)}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">

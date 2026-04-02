@@ -26,10 +26,14 @@ export default function DriversList() {
     e.user.phoneNumber?.includes(searchTerm)
   );
 
-  const totalPages = Math.ceil(filteredDrivers.length / itemsPerPage);
+  const sortedDrivers = [...filteredDrivers].sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  const totalPages = Math.ceil(sortedDrivers.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredDrivers?.reverse()?.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = sortedDrivers?.slice(indexOfFirstItem, indexOfLastItem);
 
   const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const goToPrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));

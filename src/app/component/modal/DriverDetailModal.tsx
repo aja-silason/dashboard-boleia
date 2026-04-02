@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import type { DriverOuput } from '../../infra/service/entity/UserOutput';
 import { StatusBadge } from '../budget/StatusBadget';
+import { formatDate } from '../../utils/fomateDate';
 
 interface DriverDetailProps {
   driver: DriverOuput | null;
@@ -15,14 +16,6 @@ interface DriverDetailProps {
 
 export const DriverDetailModal = ({ driver, isOpen, onClose, onApprove, onReject }: DriverDetailProps) => {
   if (!isOpen || !driver) return null;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-AO', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
