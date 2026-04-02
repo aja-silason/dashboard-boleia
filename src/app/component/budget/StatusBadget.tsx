@@ -1,6 +1,7 @@
 type props = {
     status: string
 }
+
 export const  StatusBadge = ({ status }: props ) => {
   const styles: any = {
     PENDING: "bg-orange-100 text-orange-700 border-orange-200",
