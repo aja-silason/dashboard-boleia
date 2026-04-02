@@ -4,11 +4,14 @@ import { ActivityItem } from '../component/cards/ActivityItem';
 import { useGetAllDrivers } from '../infra/hooks/driver/useGetAllDrivers';
 import { useGetAllTravel } from '../infra/hooks/travel/useGetAllTravel';
 import { RefreshButton } from '../component/button/Refreshutton';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminHomePage() {
 
   const {data: travel, handleFetch: fetchTravel} = useGetAllTravel();
   const {data, handleFetch, isLoading} = useGetAllDrivers();
+
+  const navigate = useNavigate();
 
   const approvedDrivers = data.filter(driver => driver?.status?.includes("APPROVED"));
   const requestDrivers = data.filter(driver => driver?.status?.includes("PENDING"));
@@ -75,10 +78,10 @@ export default function AdminHomePage() {
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200">
           <div className="p-6 border-b border-slate-100 flex justify-between items-center">
             <h3 className="font-bold text-slate-800">Novas Solicitações de Motoristas</h3>
-            <button className="text-blue-600 text-sm font-semibold hover:underline">Ver todos</button>
+            <button onClick={() => navigate("/motoristas")} className="text-blue-600 text-sm font-semibold hover:underline">Ver todos</button>
           </div>
           <div className="divide-y divide-slate-50">
-            {requestDrivers?.map((item, index: number) => (
+            {requestDrivers?.slice(0, 5)?.map((item, index: number) => (
               <div key={index} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">

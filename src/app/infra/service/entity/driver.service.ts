@@ -14,4 +14,13 @@ export const driver = {
     findDriverByPhoneNumber: (phoneNumber: string) => {
         return api.get<DriverOuput>(`driver/phone-number?phoneNumber=${encodeURIComponent(phoneNumber)}`)
     },
+    approveDriver: (id: string) => {
+        return api.patch<DriverOuput>(`driver/${id}/approve`)
+    },
+    declineDriver: (id: string) => {
+        return api.patch<DriverOuput>(`driver/${id}/decline`)
+    },
+    banDriver: (id: string) => {
+        return api.patch<DriverOuput>(`driver/${id}/ban`)
+    },
 }

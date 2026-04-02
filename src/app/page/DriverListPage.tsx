@@ -3,10 +3,16 @@ import { Search, Filter,  Check, X, Eye, ChevronLeft, ChevronRight } from 'lucid
 import { StatusBadge } from '../component/budget/StatusBadget';
 import { useGetAllDrivers } from '../infra/hooks/driver/useGetAllDrivers';
 import { RefreshButton } from '../component/button/Refreshutton';
+import { DriverDetailModal } from '../component/modal/DriverDetailModal';
+import type { DriverOuput } from '../infra/service/entity/UserOutput';
+import { useApproveDriver } from '../infra/hooks/driver/useApproveDriver';
+import { useDeclineDriver } from '../infra/hooks/driver/useDeclineDriver';
 
 export default function DriversList() {
 
   const {data, handleFetch, isLoading} = useGetAllDrivers();
+  const {handleSubmit: approveDriver} = useApproveDriver();
+  const {handleSubmit: declineDriver} = useDeclineDriver();
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -23,7 +29,7 @@ export default function DriversList() {
   const totalPages = Math.ceil(filteredDrivers.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredDrivers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredDrivers?.reverse()?.slice(indexOfFirstItem, indexOfLastItem);
 
   const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const goToPrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
@@ -31,6 +37,26 @@ export default function DriversList() {
   const handleSearchChange = (val: string) => {
     setSearchTerm(val);
     setCurrentPage(1);
+  };
+
+  const [selectedDriver, setSelectedDriver] = useState<DriverOuput | null>(null);
+const [isModalOpen, setIsModalOpen] = useState(false);
+
+const handleOpenDetails = (driver: DriverOuput) => {
+  setSelectedDriver(driver);
+  setIsModalOpen(true);
+};
+
+  const handleApprove = async (id: string) => {
+    await approveDriver(id)
+    setIsModalOpen(false);
+    handleFetch();
+  };
+
+  const handleReject = async (id: string) => {
+    await declineDriver(id);
+    setIsModalOpen(false);
+    handleFetch();
   };
 
   return (
@@ -92,7 +118,7 @@ export default function DriversList() {
                   </td>
                   <td className="p-4">
                     <div className="flex justify-end gap-2">
-                      <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                      <button onClick={() => handleOpenDetails(driver)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
                         <Eye size={18} />
                       </button>
                       <button className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all">
@@ -149,6 +175,15 @@ export default function DriversList() {
           </div>
         </div>
       </div>
+
+      <DriverDetailModal 
+        driver={selectedDriver}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
+
     </div>
   );
 }
