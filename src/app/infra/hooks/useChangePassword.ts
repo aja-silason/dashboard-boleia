@@ -1,10 +1,7 @@
-import { RootStackParamList } from "@/app/shared/route";
-import { RouteProp, useRoute } from "@react-navigation/native";
 import axios from "axios";
-import { useState } from "react";
-import { Alert, Keyboard } from "react-native";
-import { Auth } from "../service/entity/auth.service";
-import { ChangePasswordInput } from "./ChangePasswordInput";
+import { useState, type FormEvent } from "react";
+import type { ChangePasswordInput } from "./ChangePasswordInput";
+import { auth } from "../service/entity/auth.service";
 
 type Props = {
     password: string;
@@ -18,36 +15,31 @@ export const useChangePassword = () => {
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const route = useRoute<RouteProp<RootStackParamList, "typepassword">>();
-    
-
     const handleChange = (name: string, value: string) => {
         setData((prevState) => ({
             ...prevState, [name] : value
         }))
     }
 
-        console.log(route?.params?.phoneNumber)
 
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
 
-    const handleSubmit = async () => {
-        Keyboard.dismiss();
+        if(data.password.length !== 6) return alert("A senha deve ter exatamente 6 caracteres.");
 
-        if(data.password.length !== 6) return Alert.alert("Informação", "A senha deve ter exatamente 6 caracteres.");
-
-        if(data.password !== data.repeatPassword) return Alert.alert("Informação", "Senha não coincidem, tente novamente");
+        if(data.password !== data.repeatPassword) return alert("Senha não coincidem, tente novamente");
 
 
 
         const payload: ChangePasswordInput = {
-            phoneNumber: route?.params?.phoneNumber,
+            phoneNumber: data.identificationNumber,
             password: data.password
         }
 
         try {
             setIsLoading(true);
 
-            await Auth.auth.changePassword(payload);
+            await auth.changePassword(payload);
             
             setIsSuccess(true);
             setIsLoading(false);
@@ -56,11 +48,9 @@ export const useChangePassword = () => {
             setIsLoading(false);
             setIsSuccess(false);
             if(axios.isAxiosError(error)){
-                if(error.status === 500) return Alert.alert("Aviso", `Alguma coisa correu mal, estamos resolvendo por você`, [
-                    {text: "Entendido", onPress: () => {}}
-                ]);
-                if(error.status === 400) return Alert.alert("Informação", error.response?.data.message);
-                if(error.status === 404) return Alert.alert("Informação", error.response?.data.message);
+                if(error.status === 500) return alert(`Alguma coisa correu mal, estamos resolvendo por você`);
+                if(error.status === 400) return alert(error.response?.data.message);
+                if(error.status === 404) return alert(error.response?.data.message);
             }
         }
 
