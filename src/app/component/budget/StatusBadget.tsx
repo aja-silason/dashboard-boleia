@@ -16,7 +16,7 @@ export const  StatusBadge = ({ status }: props ) => {
 
   return (
     <span className={`px-3 py-1 rounded-full text-[11px] font-bold border ${styles[status]}`}>
-      {labels[status].toUpperCase()}
+      {labels[status]?.toUpperCase()}
     </span>
   );
 }

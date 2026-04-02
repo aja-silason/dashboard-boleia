@@ -1,15 +1,16 @@
 import  { useState } from 'react';
 import { Search, Filter,  Check, X, Eye } from 'lucide-react';
 import { StatusBadge } from '../component/budget/StatusBadget';
-
-const MOCK_DRIVERS = [
-  { id: '1', name: 'Anania Augusto', phone: '+244 944 996 909', nif: '006543210LA044', status: 'PENDING' },
-  { id: '2', name: 'Sofia Mendes', phone: '+244 923 111 222', nif: '007123456BC012', status: 'ACTIVE' },
-  { id: '3', name: 'Carlos Manuel', phone: '+244 912 333 444', nif: '001987654LA099', status: 'INACTIVE' },
-];
+import { useGetAllDrivers } from '../infra/hooks/driver/useGetAllDrivers';
+import { RefreshButton } from '../component/button/Refreshutton';
 
 export default function DriversList() {
+
+  const {data, handleFetch, isLoading} = useGetAllDrivers();
+
   const [searchTerm, setSearchTerm] = useState('');
+
+  const filterTravels = data.filter(e => e.identificationNumber?.includes(searchTerm) || e.licenseNumber?.includes(searchTerm) || e.user.firstName?.includes(searchTerm) || e.user.lastName?.includes(searchTerm) || e.user.phoneNumber?.includes(searchTerm));
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
@@ -17,6 +18,7 @@ export default function DriversList() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Gestão de Motoristas</h1>
           <p className="text-slate-500">Aprove, bloqueie ou visualize detalhes dos condutores.</p>
+          <RefreshButton onClick={handleFetch} isLoading={isLoading}/>
         </div>
       </div>
 
@@ -51,18 +53,18 @@ export default function DriversList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {MOCK_DRIVERS.map((driver) => (
-              <tr key={driver.id} className="hover:bg-slate-50 transition-colors">
+            {filterTravels?.map((driver, index: number) => (
+              <tr key={index} className="hover:bg-slate-50 transition-colors">
                 <td className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
-                      {driver.name.charAt(0)}
+                      {driver?.user.firstName?.charAt(0)}
                     </div>
-                    <span className="font-semibold text-slate-700">{driver.name}</span>
+                    <span className="font-semibold text-slate-700">{driver?.user.firstName + '' +driver?.user.lastName}</span>
                   </div>
                 </td>
-                <td className="p-4 text-slate-600 text-sm">{driver.nif}</td>
-                <td className="p-4 text-slate-600 text-sm">{driver.phone}</td>
+                <td className="p-4 text-slate-600 text-sm">{driver?.identificationNumber}</td>
+                <td className="p-4 text-slate-600 text-sm">{driver?.user.phoneNumber}</td>
                 <td className="p-4">
                   <StatusBadge status={driver.status} />
                 </td>

@@ -1,8 +1,9 @@
-import { Users, TrendingUp, AlertCircle, CheckCircle2, Clock, RefreshCcw} from 'lucide-react';
+import { Users, TrendingUp, AlertCircle, CheckCircle2, Clock} from 'lucide-react';
 import { StatCard } from '../component/cards/StatCard';
 import { ActivityItem } from '../component/cards/ActivityItem';
 import { useGetAllDrivers } from '../infra/hooks/driver/useGetAllDrivers';
 import { useGetAllTravel } from '../infra/hooks/travel/useGetAllTravel';
+import { RefreshButton } from '../component/button/Refreshutton';
 
 export default function AdminHomePage() {
 
@@ -31,12 +32,7 @@ export default function AdminHomePage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Olá, Administrador</h1>
           <p className="text-slate-500">Aqui está o que está a acontecer na plataforma hoje.</p>
-          <button
-          onClick={fetch}
-           className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white mt-5 px-2 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
-            <RefreshCcw size={18} />
-            {isLoading ? 'Processando...' : 'Recarregar'}
-          </button>
+          <RefreshButton onClick={fetch} isLoading={isLoading}/>
         </div>
         <button className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
           <TrendingUp size={18} />
