@@ -1,9 +1,8 @@
 import axios from "axios";
-import { useState } from "react";
-import { Alert, Keyboard } from "react-native";
-import { Driver } from "../../service/entity/driver.service";
-import { Vehicle } from "../../service/vehicle/vehicle.service";
-import { RegisterVehicleInput } from "./RegisterVehicleInput";
+import { useState, type FormEvent } from "react";
+import type { RegisterVehicleInput } from "./RegisterVehicleInput";
+import { driver } from "../../service/entity/driver.service";
+import { vehicle } from "../../service/vehicle/vehicle.service";
 
 export const useRegisterVehicle = (phoneNumber: string) => {
 
@@ -18,13 +17,13 @@ export const useRegisterVehicle = (phoneNumber: string) => {
 
     console.log(phoneNumber)
 
-    const handleSubmit = async () => {
-        Keyboard.dismiss();
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
         
         try {
             setIsLoading(true)
 
-            const out = await Driver.driver.findDriverByPhoneNumber(phoneNumber);
+            const out = await driver.findDriverByPhoneNumber(phoneNumber);
 
             const driverId = out?.data?.id;
 
@@ -33,18 +32,16 @@ export const useRegisterVehicle = (phoneNumber: string) => {
                 idDriver: driverId
             }
 
-            await Vehicle.vehicle.registerVehicle(payload);
+            await vehicle.registerVehicle(payload);
 
             setIsLoading(false)
             
         } catch (error) {
             setIsLoading(false)
             if(axios.isAxiosError(error)){
-                if(error.status === 500) return Alert.alert("Aviso", "Alguma coisa correu mal, estamos resolvendo por você", [
-                    {text: "Entendido", onPress: () => {}}
-                ]);
-                if(error.status === 400) return Alert.alert("Informação", error.response?.data.message);
-                if(error.status === 404) return Alert.alert("Informação", error.response?.data.message);   
+                if(error.status === 500) return alert("Alguma coisa correu mal, estamos resolvendo por você");
+                if(error.status === 400) return alert(error.response?.data.message);
+                if(error.status === 404) return alert(error.response?.data.message);   
             }
             return;
         }

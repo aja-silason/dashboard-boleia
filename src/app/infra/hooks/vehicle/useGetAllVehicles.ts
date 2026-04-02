@@ -1,18 +1,12 @@
-import { useAuthContext } from "@/app/shared/context/auth.context";
-import axios from "axios";
 import { useCallback, useState } from "react";
-import { Alert } from "react-native";
-import { Vehicle } from "../../service/vehicle/vehicle.service";
-import { VehicleOutput } from "../../service/vehicle/VehicleOutput";
+import type { VehicleOutput } from "../../service/vehicle/VehicleOutput";
+import { vehicle } from "../../service/vehicle/vehicle.service";
+import axios from "axios";
 
 export const useGetAllVehicles = () => {
     const [data, setData] = useState<VehicleOutput[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
-
-    const {userInformation} = useAuthContext();
-
-    const driverId = userInformation != null ? userInformation?.id : "N-D";
 
     const handleFetch = useCallback(async () => {
 
@@ -21,9 +15,7 @@ export const useGetAllVehicles = () => {
             setIsLoading(true);
             setIsError(false);
 
-            if(driverId === "N-D") return;
-
-            const res = await Vehicle.vehicle.findAllVehicle(driverId);
+            const res = await vehicle.findAllVehicle();
 
             setData(res.data);
 
@@ -33,13 +25,13 @@ export const useGetAllVehicles = () => {
 
             if (axios.isAxiosError(error)) {
                 const message = error.response?.data?.message || "Não foi possível carregar as viagens.";
-                Alert.alert("Aviso", message);
+                alert(message);
             }
         } finally {
             setIsLoading(false);
         }
 
-    }, [driverId]);
+    }, []);
 
     return {
         data,
