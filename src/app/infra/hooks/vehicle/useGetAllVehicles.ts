@@ -24,7 +24,7 @@ export const useGetAllVehicles = () => {
             console.error("Erro ao buscar viagens:", error);
 
             if (axios.isAxiosError(error)) {
-                const message = error.response?.data?.message || "Não foi possível carregar as viagens.";
+                const message = error.response?.data?.message || "Não foi possível carregar os veiculos.";
                 alert(message);
             }
         } finally {
