@@ -10,6 +10,7 @@ export default defineConfig({
     port: process.env.PORT ? Number(process.env.PORT) : 4173,
     allowedHosts: [
       'dashboard-boleia.onrender.com',
+      'dashboard-boleia-1.onrender.com',
       '.onrender.com'
     ]
   },
